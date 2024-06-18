@@ -15,6 +15,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: List all available artifacts for debugging
+        run: |
+          echo "Listing all artifacts in the repository"
+          gh api -X GET repos/:owner/:repo/actions/artifacts --paginate
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Download Python Lambda artifact
         uses: actions/download-artifact@v4
         with:
