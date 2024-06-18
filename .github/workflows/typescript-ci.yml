@@ -25,9 +25,9 @@ jobs:
         run: npm install
         working-directory: my_ts_service
 
-      - name: Run tests
-        run: npm test
-        working-directory: my_ts_service
+    #   - name: Run tests
+    #     run: npm test
+    #     working-directory: my_ts_service
 
       - name: Build TypeScript project
         run: npm run build

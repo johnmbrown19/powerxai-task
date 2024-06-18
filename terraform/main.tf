@@ -20,12 +20,12 @@ resource "aws_iam_role" "lambda_role" {
 }
 
 resource "aws_lambda_function" "python_lambda" {
-  filename         = "${path.module}/my_python_service/function.zip"
+  filename         = "${path.module}/my_python_service/src/function.zip"
   function_name    = "python_lambda_function"
   role             = aws_iam_role.lambda_role.arn
   handler          = "main.handler"
   runtime          = "python3.9"
-  source_code_hash = filebase64sha256("${path.module}/my_python_service/function.zip")
+  source_code_hash = filebase64sha256("${path.module}/my_python_service/src/function.zip")
 }
 
 resource "aws_lambda_function" "typescript_lambda" {
