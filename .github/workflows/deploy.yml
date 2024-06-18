@@ -18,7 +18,7 @@ jobs:
       - name: Download Python Lambda artifact
         uses: actions/download-artifact@v4
         with:
-          name: python-lambda
+          name: python-lambda.zip
           path: my_python_service/src/function.zip
           run-id: ${{ github.event.workflow_run.id }}
           repository: ${{ github.repository }}
@@ -26,7 +26,7 @@ jobs:
       - name: Download TypeScript Lambda artifact
         uses: actions/download-artifact@v4
         with:
-          name: typescript-lambda
+          name: typescript-lambda.zip
           path: my_ts_service/dist/function.zip
           run-id: ${{ github.event.workflow_run.id }}
           repository: ${{ github.repository }}
