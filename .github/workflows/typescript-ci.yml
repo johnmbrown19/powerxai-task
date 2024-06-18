@@ -14,20 +14,16 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
 
       - name: Install dependencies
         run: npm install
         working-directory: my_ts_service
-
-    #   - name: Run tests
-    #     run: npm test
-    #     working-directory: my_ts_service
 
       - name: Build TypeScript project
         run: npm run build
@@ -40,7 +36,7 @@ jobs:
           cd ../..
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: typescript-lambda
           path: my_ts_service/dist/function.zip
