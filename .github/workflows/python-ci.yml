@@ -2,11 +2,11 @@ name: Python CI
 
 on:
   push:
-    paths:
-      - 'my_python_service/**'
+    branches:
+      - main
   pull_request:
-    paths:
-      - 'my_python_service/**'
+    branches:
+      - main
 
 jobs:
   build:
@@ -31,8 +31,10 @@ jobs:
           pytest my_python_service/src/test_main.py
 
       - name: Package lambda
-        run: zip -r function.zip .
-        working-directory: my_python_service/src
+        run: |
+          cd my_python_service/src
+          zip -r function.zip .
+          cd ../..
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2

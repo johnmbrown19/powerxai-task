@@ -2,11 +2,11 @@ name: TypeScript CI
 
 on:
   push:
-    paths:
-      - 'my_ts_service/**'
+    branches:
+      - main
   pull_request:
-    paths:
-      - 'my_ts_service/**'
+    branches:
+      - main
 
 jobs:
   build:
@@ -25,16 +25,22 @@ jobs:
         run: npm install
         working-directory: my_ts_service
 
-      - name: Run build
+      - name: Run tests
+        run: npm test
+        working-directory: my_ts_service
+
+      - name: Build TypeScript project
         run: npm run build
         working-directory: my_ts_service
 
       - name: Package lambda
-        run: zip -r function.zip dist/
-        working-directory: my_ts_service
+        run: |
+          cd my_ts_service/dist
+          zip -r function.zip .
+          cd ../..
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
           name: typescript-lambda
-          path: my_ts_service/dist/
+          path: my_ts_service/dist/function.zip

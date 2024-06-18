@@ -1,4 +1,4 @@
-name: Deploy Lambda
+name: Deploy
 
 on:
   push:
@@ -13,63 +13,34 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
-
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r my_python_service/requirements.txt
-
-      - name: Run Python tests
-        run: |
-            pytest my_python_service/src/test_main.py
-
-      - name: Package Python lambda
-        run: zip -r function.zip .
-        working-directory: my_python_service
-
-      - name: Upload Python artifact
-        uses: actions/upload-artifact@v2
+      - name: Download Python Lambda artifact
+        uses: actions/download-artifact@v2
         with:
           name: python-lambda
-          path: my_python_service/function.zip
+          path: my_python_service/src
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-
-      - name: Install Node.js dependencies
-        run: npm install
-        working-directory: my_ts_service
-
-      - name: Run Node.js build
-        run: npm run build
-        working-directory: my_ts_service
-
-      - name: Package Node.js lambda
-        run: zip -r function.zip .
-        working-directory: my_ts_service
-
-      - name: Upload Node.js artifact
-        uses: actions/upload-artifact@v2
+      - name: Download TypeScript Lambda artifact
+        uses: actions/download-artifact@v2
         with:
           name: typescript-lambda
-          path: my_ts_service/function.zip
+          path: my_ts_service/dist
 
-      - name: Set up Terraform
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Install Terraform
         uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_wrapper: false
 
-      - name: Terraform Init
+      - name: Initialize Terraform
         run: terraform init
         working-directory: terraform
 
-      - name: Terraform Apply
+      - name: Apply Terraform
         run: terraform apply -auto-approve
         working-directory: terraform
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
