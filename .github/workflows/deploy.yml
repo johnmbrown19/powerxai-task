@@ -19,13 +19,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: python-lambda
-          path: my_python_service/src
+          path: my_python_service/src/function.zip
 
       - name: Download TypeScript Lambda artifact
         uses: actions/download-artifact@v4
         with:
           name: typescript-lambda
-          path: my_ts_service/dist
+          path: my_ts_service/dist/function.zip
 
       - name: Verify Python Lambda artifact
         run: |
