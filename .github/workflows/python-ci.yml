@@ -1,0 +1,41 @@
+name: Python CI
+
+on:
+  push:
+    paths:
+      - 'my_python_service/**'
+  pull_request:
+    paths:
+      - 'my_python_service/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r my_python_service/requirements.txt
+
+      - name: Run tests
+        run: |
+          pytest my_python_service/tests
+
+      - name: Package lambda
+        run: zip -r function.zip .
+        working-directory: my_python_service/src
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: python-lambda
+          path: my_python_service/src/function.zip

@@ -1,0 +1,46 @@
+{
+    "body": "",
+    "headers": {},
+    "httpMethod": "GET",
+    "isBase64Encoded": false,
+    "path": "/",
+    "pathParameters": {},
+    "queryStringParameters": {},
+    "resource": "",
+    "stageVariables": {},
+    "requestContext": {
+      "accountId": "",
+      "apiId": "",
+      "authorizer": {},
+      "domainName": "",
+      "domainPrefix": "",
+      "extendedRequestId": "",
+      "httpMethod": "",
+      "identity": {
+        "accessKey": "",
+        "accountId": "",
+        "apiKey": "",
+        "apiKeyId": "",
+        "caller": "",
+        "cognitoAuthenticationProvider": "",
+        "cognitoAuthenticationType": "",
+        "cognitoIdentityId": "",
+        "cognitoIdentityPoolId": "",
+        "principalOrgId": "",
+        "sourceIp": "",
+        "user": "",
+        "userAgent": "",
+        "userArn": "",
+        "clientCert": null
+      },
+      "path": "",
+      "protocol": "",
+      "requestId": "",
+      "requestTime": "",
+      "requestTimeEpoch": 0,
+      "resourceId": "",
+      "resourcePath": "",
+      "stage": ""
+    }
+  }
+  
