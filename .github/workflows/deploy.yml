@@ -25,6 +25,12 @@ jobs:
           name: typescript-lambda
           path: my_ts_service/dist
 
+      - name: List files for debugging
+        run: ls -R my_python_service/src
+
+      - name: List files for debugging
+        run: ls -R my_ts_service/dist
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:

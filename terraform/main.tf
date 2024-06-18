@@ -33,6 +33,6 @@ resource "aws_lambda_function" "typescript_lambda" {
   function_name    = "typescript_lambda_function"
   role             = aws_iam_role.lambda_role.arn
   handler          = "index.handler"
-  runtime          = "nodejs18.x"  # Update to nodejs18.x or nodejs20.x
+  runtime          = "nodejs18.x"
   source_code_hash = filebase64sha256("${path.module}/my_ts_service/dist/function.zip")
 }
