@@ -15,10 +15,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: List all available artifacts for debugging
-        run: |
-          echo "Listing all artifacts in the repository"
-          gh api -X GET repos/${{ github.repository }}/actions/artifacts --paginate
+    #   - name: List all available artifacts for debugging
+    #     run: |
+    #       echo "Listing all artifacts in the repository"
+    #       gh api -X GET repos/${{ github.repository }}/actions/artifacts --paginate
 
       - name: Download Python Lambda artifact manually
         run: |
