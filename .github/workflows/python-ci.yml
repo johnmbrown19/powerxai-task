@@ -41,3 +41,12 @@ jobs:
         with:
           name: python-lambda
           path: my_python_service/src/function.zip
+
+      - name: Output Run ID
+        run: echo ${{ github.run_id }} > run_id.txt
+
+      - name: Upload Run ID
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-run-id
+          path: run_id.txt

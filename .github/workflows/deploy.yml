@@ -15,20 +15,40 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Download Run ID (Python)
+        uses: actions/download-artifact@v4
+        with:
+          name: python-run-id
+          path: python-run-id
+
+      - name: Read Run ID (Python)
+        id: python-run-id
+        run: echo "::set-output name=run_id::$(cat python-run-id/run_id.txt)"
+
       - name: Download Python Lambda artifact
         uses: actions/download-artifact@v4
         with:
-          name: python-lambda.zip
+          name: python-lambda
           path: my_python_service/src/function.zip
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ steps.python-run-id.outputs.run_id }}
           repository: ${{ github.repository }}
-      
+
+      - name: Download Run ID (TypeScript)
+        uses: actions/download-artifact@v4
+        with:
+          name: typescript-run-id
+          path: typescript-run-id
+
+      - name: Read Run ID (TypeScript)
+        id: typescript-run-id
+        run: echo "::set-output name=run_id::$(cat typescript-run-id/run_id.txt)"
+
       - name: Download TypeScript Lambda artifact
         uses: actions/download-artifact@v4
         with:
-          name: typescript-lambda.zip
+          name: typescript-lambda
           path: my_ts_service/dist/function.zip
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ steps.typescript-run-id.outputs.run_id }}
           repository: ${{ github.repository }}
 
       - name: Verify Python Lambda artifact
