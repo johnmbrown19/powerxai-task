@@ -22,17 +22,17 @@ This repository contains two serverless functions: one written in Python and one
 
 #### Python Service
 
-cd my_python_service
-sam build -t ../python-template.yaml
-sam local invoke PythonFunction -t ../python-template.yaml --event ../event.json
+- cd my_python_service
+- sam build -t ../python-template.yaml
+- sam local invoke PythonFunction -t ../python-template.yaml --event ../event.json
 
 #### Typescript Service
 
-cd my_ts_service
-npm install
-npm run build
-sam build -t ../typescript-template.yaml
-sam local invoke TypeScriptFunction -t ../typescript-template.yaml --event ../event.json
+- cd my_ts_service
+- npm install
+- npm run build
+- sam build -t ../typescript-template.yaml
+- sam local invoke TypeScriptFunction -t ../typescript-template.yaml --event ../event.json
 
 ### Deployment
 Follow the steps in the Terraform directory to deploy the services to AWS.
