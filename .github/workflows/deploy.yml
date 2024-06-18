@@ -15,20 +15,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-    #   - name: List all available artifacts for debugging
-    #     run: |
-    #       echo "Listing all artifacts in the repository"
-    #       gh api -X GET repos/${{ github.repository }}/actions/artifacts --paginate
+      - name: Download Python Lambda artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: python-lambda
+          path: my_python_service/src
 
-      - name: Download Python Lambda artifact manually
-        run: |
-          curl -L -o python-lambda.zip https://api.github.com/repos/${{ github.repository }}/actions/artifacts/1614540362/zip
-          unzip python-lambda.zip -d my_python_service/src
+      - name: Download TypeScript Lambda artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: typescript-lambda
+          path: my_ts_service/dist
 
-      - name: Download TypeScript Lambda artifact manually
+      - name: Verify Python Lambda artifact
         run: |
-          curl -L -o typescript-lambda.zip https://api.github.com/repos/${{ github.repository }}/actions/artifacts/1614540544/zip
-          unzip typescript-lambda.zip -d my_ts_service/dist
+          if [ ! -f my_python_service/src/function.zip ]; then
+            echo "Python Lambda artifact not found"
+            exit 1
+          fi
+
+      - name: Verify TypeScript Lambda artifact
+        run: |
+          if [ ! -f my_ts_service/dist/function.zip ]; then
+            echo "TypeScript Lambda artifact not found"
+            exit 1
+          fi
 
       - name: List files for debugging (Python)
         run: ls -R my_python_service/src
