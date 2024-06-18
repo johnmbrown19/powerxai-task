@@ -28,7 +28,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest my_python_service/tests
+          pytest my_python_service/src/test_main.py
 
       - name: Package lambda
         run: zip -r function.zip .
