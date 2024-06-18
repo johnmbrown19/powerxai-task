@@ -20,12 +20,16 @@ jobs:
         with:
           name: python-lambda
           path: my_python_service/src/function.zip
-
+          run-id: ${{ github.event.workflow_run.id }}
+          repository: ${{ github.repository }}
+      
       - name: Download TypeScript Lambda artifact
         uses: actions/download-artifact@v4
         with:
           name: typescript-lambda
           path: my_ts_service/dist/function.zip
+          run-id: ${{ github.event.workflow_run.id }}
+          repository: ${{ github.repository }}
 
       - name: Verify Python Lambda artifact
         run: |
