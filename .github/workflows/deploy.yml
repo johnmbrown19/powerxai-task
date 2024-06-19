@@ -41,23 +41,25 @@ jobs:
           ts_artifact = next((artifact for artifact in artifacts if artifact['name'] == 'typescript-lambda'), None)
 
           if python_artifact:
-              print(f'::set-output name=python_url::{python_artifact["archive_download_url"]}')
+              with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
+                  env_file.write(f'PYTHON_URL={python_artifact["archive_download_url"]}\n')
           if ts_artifact:
-              print(f'::set-output name=ts_url::{ts_artifact["archive_download_url"]}')
+              with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
+                  env_file.write(f'TS_URL={ts_artifact["archive_download_url"]}\n')
           EOF
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download Python Lambda artifact manually
-        if: steps.artifact-urls.outputs.python_url
+        if: env.PYTHON_URL
         run: |
-          curl -L -o python-lambda.zip "${{ steps.artifact-urls.outputs.python_url }}"
+          curl -L -o python-lambda.zip "$PYTHON_URL"
           unzip python-lambda.zip -d my_python_service/src
 
       - name: Download TypeScript Lambda artifact manually
-        if: steps.artifact-urls.outputs.ts_url
+        if: env.TS_URL
         run: |
-          curl -L -o typescript-lambda.zip "${{ steps.artifact-urls.outputs.ts_url }}"
+          curl -L -o typescript-lambda.zip "$TS_URL"
           unzip typescript-lambda.zip -d my_ts_service/dist
 
       - name: List files for debugging (Python)
