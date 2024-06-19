@@ -16,13 +16,13 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Download Python Lambda artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: python-lambda
           path: my_python_service/build
 
       - name: Download TypeScript Lambda artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: typescript-lambda
           path: my_ts_service/build

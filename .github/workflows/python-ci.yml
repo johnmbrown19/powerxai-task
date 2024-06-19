@@ -34,7 +34,8 @@ jobs:
         run: zip -r my_python_service/build/function.zip my_python_service/src
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: python-lambda
           path: my_python_service/build/function.zip
+          overwrite: true
