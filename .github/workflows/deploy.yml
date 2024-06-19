@@ -42,25 +42,29 @@ jobs:
 
           if python_artifact:
               with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
-                  env_file.write(f'PYTHON_URL={python_artifact["archive_download_url"]}\n')
+                  env_file.write(f'PYTHON_ARTIFACT_ID={python_artifact["id"]}\n')
           if ts_artifact:
               with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
-                  env_file.write(f'TS_URL={ts_artifact["archive_download_url"]}\n')
+                  env_file.write(f'TS_ARTIFACT_ID={ts_artifact["id"]}\n')
           EOF
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Download Python Lambda artifact manually
-        if: env.PYTHON_URL
+      - name: Download Python Lambda artifact using gh CLI
+        if: env.PYTHON_ARTIFACT_ID
         run: |
-          curl -L -o python-lambda.zip "$PYTHON_URL"
-          unzip python-lambda.zip -d my_python_service/src
+          gh run download ${{ github.run_id }} --name python-lambda --pattern "**/*.zip"
+          unzip -o -d my_python_service/src *.zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Download TypeScript Lambda artifact manually
-        if: env.TS_URL
+      - name: Download TypeScript Lambda artifact using gh CLI
+        if: env.TS_ARTIFACT_ID
         run: |
-          curl -L -o typescript-lambda.zip "$TS_URL"
-          unzip typescript-lambda.zip -d my_ts_service/dist
+          gh run download ${{ github.run_id }} --name typescript-lambda --pattern "**/*.zip"
+          unzip -o -d my_ts_service/dist *.zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: List files for debugging (Python)
         run: ls -R my_python_service/src
