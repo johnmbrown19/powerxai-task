@@ -1,17 +1,16 @@
 name: Deploy
 
 on:
-    workflow_run:
-      workflows: ["Python CI", "TypeScript CI"]
-      types: [completed]
-      branches: [main]
-      
+  workflow_run:
+    workflows: ["Python CI", "TypeScript CI"]
+    types: [completed]
+    branches: [main]
+
 jobs:
   deploy:
-    if: >
+    if: |
       github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.name == 'Python CI' &&
-      github.event.workflow_run.name == 'TypeScript CI'
+      (github.event.workflow_run.name == 'Python CI' || github.event.workflow_run.name == 'TypeScript CI')
     runs-on: ubuntu-latest
 
     permissions:
@@ -21,6 +20,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Print event payload
+        run: echo '${{ toJson(github.event) }}'
+
+      - name: Print Python CI status
+        if: ${{ github.event.workflow_run.name == 'Python CI' }}
+        run: echo 'Python CI workflow succeeded'
+
+      - name: Print TypeScript CI status
+        if: ${{ github.event.workflow_run.name == 'TypeScript CI' }}
+        run: echo 'TypeScript CI workflow succeeded'
 
       - name: Print artifacts URL
         run: echo ${{ github.event.workflow_run.artifacts_url }}
