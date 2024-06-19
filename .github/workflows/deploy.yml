@@ -19,41 +19,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Download Run ID (Python)
-        uses: actions/download-artifact@v3
-        with:
-          name: python-run-id
-          path: python-run-id
-
-      - name: Read Run ID (Python)
-        id: python-run-id
-        run: echo "::set-output name=run_id::$(cat python-run-id/run_id.txt)"
+      - name: Get Python CI run ID
+        id: python_run_id
+        run: |
+          python_run_id=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/actions/workflows/python-ci.yml/runs | jq -r '.workflow_runs[] | select(.head_sha == "${{ github.event.workflow_run.head_sha }}") | .id')
+          echo "::set-output name=run_id::$python_run_id"
 
       - name: Download Python Lambda artifact
         uses: actions/download-artifact@v3
         with:
           name: python-lambda
           path: my_python_service/build
-          run-id: ${{ steps.python-run-id.outputs.run_id }}
-          repository: ${{ github.repository }}
 
-      - name: Download Run ID (TypeScript)
-        uses: actions/download-artifact@v3
-        with:
-          name: typescript-run-id
-          path: typescript-run-id
-
-      - name: Read Run ID (TypeScript)
-        id: typescript-run-id
-        run: echo "::set-output name=run_id::$(cat typescript-run-id/run_id.txt)"
+      - name: Get TypeScript CI run ID
+        id: typescript_run_id
+        run: |
+          typescript_run_id=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/actions/workflows/typescript-ci.yml/runs | jq -r '.workflow_runs[] | select(.head_sha == "${{ github.event.workflow_run.head_sha }}") | .id')
+          echo "::set-output name=run_id::$typescript_run_id"
 
       - name: Download TypeScript Lambda artifact
         uses: actions/download-artifact@v3
         with:
           name: typescript-lambda
           path: my_ts_service/build
-          run-id: ${{ steps.typescript-run-id.outputs.run_id }}
-          repository: ${{ github.repository }}
 
       - name: List files for debugging (Python)
         run: ls -R my_python_service/build
