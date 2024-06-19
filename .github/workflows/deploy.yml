@@ -30,24 +30,24 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    #   - name: Delete all artifacts
-    #     if: always()
-    #     run: |
-    #       gh api -X GET repos/${{ github.repository }}/actions/artifacts --paginate --jq '.artifacts[].id' | while read -r artifact_id; do
-    #         gh api -X DELETE repos/${{ github.repository }}/actions/artifacts/$artifact_id
-    #       done
-    #     env:
-    #       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #     # needs: list-artifacts
+      - name: Delete all artifacts
+        if: always()
+        run: |
+          gh api -X GET repos/${{ github.repository }}/actions/artifacts --paginate --jq '.artifacts[].id' | while read -r artifact_id; do
+            gh api -X DELETE repos/${{ github.repository }}/actions/artifacts/$artifact_id
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # needs: list-artifacts
 
       - name: Download Python Lambda artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: python-lambda-${{ github.sha }}
           path: my_python_service/build
 
       - name: Download TypeScript Lambda artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: typescript-lambda-${{ github.sha }}
           path: my_ts_service/build
