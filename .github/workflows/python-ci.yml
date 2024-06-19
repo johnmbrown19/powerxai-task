@@ -4,41 +4,37 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.9
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.9'
 
-    - name: Install dependencies
-      working-directory: my_python_service
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r my_python_service/requirements.txt
 
-    - name: Run tests
-      working-directory: my_python_service
-      run: pytest
+      - name: Run tests
+        run: |
+          pytest my_python_service/tests
 
-    - name: Build Lambda
-      working-directory: my_python_service
-      run: |
-        mkdir -p build
-        zip -r build/function.zip src
+      - name: Create build directory
+        run: mkdir -p my_python_service/build
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: python-lambda
-        path: my_python_service/build/function.zip
+      - name: Zip function
+        run: zip -r my_python_service/build/function.zip my_python_service/src
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: python-lambda
+          path: my_python_service/build/function.zip

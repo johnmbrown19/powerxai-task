@@ -4,39 +4,36 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
 
-    - name: Install dependencies
-      working-directory: my_ts_service
-      run: npm install
+      - name: Install dependencies
+        run: npm install
+        working-directory: my_ts_service
 
-    - name: Build Lambda
-      working-directory: my_ts_service
-      run: npm run build
+      - name: Build the project
+        run: npm run build
+        working-directory: my_ts_service
 
-    - name: Package Lambda
-      working-directory: my_ts_service
-      run: |
-        mkdir -p build
-        zip -r build/function.zip dist
+      - name: Create build directory
+        run: mkdir -p my_ts_service/build
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: typescript-lambda
-        path: my_ts_service/build/function.zip
+      - name: Zip function
+        run: zip -r my_ts_service/build/function.zip my_ts_service/dist
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: typescript-lambda
+          path: my_ts_service/build/function.zip

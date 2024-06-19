@@ -13,45 +13,24 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Set up Python and Node.js
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v3
         with:
           python-version: '3.9'
 
-      - name: List all artifacts in the repository
-        id: list-artifacts
-        run: |
-          gh api -X GET repos/${{ github.repository }}/actions/artifacts --paginate > artifacts.json
-          cat artifacts.json
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Get Artifact URLs
-        id: get-artifact-urls
-        run: |
-          python <<EOF
-          import os
-          import json
-
-          with open('artifacts.json') as f:
-              artifacts = json.load(f)['artifacts']
-
-          for artifact in artifacts:
-              if artifact['name'] == 'python-lambda':
-                  print(f"::set-output name=python_url::{artifact['archive_download_url']}")
-              elif artifact['name'] == 'typescript-lambda':
-                  print(f"::set-output name=ts_url::{artifact['archive_download_url']}")
-          EOF
-
       - name: Download Python Lambda artifact
-        run: |
-          curl -L -o my_python_service/build/function.zip ${{ steps.get-artifact-urls.outputs.python_url }}
+        uses: actions/download-artifact@v3
+        with:
+          name: python-lambda
+          path: my_python_service/build
 
       - name: Download TypeScript Lambda artifact
-        run: |
-          curl -L -o my_ts_service/build/function.zip ${{ steps.get-artifact-urls.outputs.ts_url }}
+        uses: actions/download-artifact@v3
+        with:
+          name: typescript-lambda
+          path: my_ts_service/build
 
       - name: List files for debugging (Python)
         run: ls -R my_python_service/build
@@ -60,14 +39,14 @@ jobs:
         run: ls -R my_ts_service/build
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-central-1
 
       - name: Install Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v1
         with:
           terraform_wrapper: false
 
