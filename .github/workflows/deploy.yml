@@ -25,23 +25,37 @@ jobs:
           python_run_id=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/actions/workflows/python-ci.yml/runs?status=success | jq -r '.workflow_runs[0].id')
           echo "run_id=$python_run_id" >> $GITHUB_OUTPUT
 
-      - name: Download Python Lambda artifact
+      - name: Download all artifacts from Python CI
         uses: actions/download-artifact@v3
         with:
-          name: python-lambda
-          path: my_python_service/build
+          run_id: ${{ steps.python_run_id.outputs.run_id }}
+          path: python-artifacts
+
+      - name: List downloaded artifacts (Python)
+        run: ls -R python-artifacts
+
+      - name: Download Python Lambda artifact
+        run: |
+          cp python-artifacts/python-lambda/function.zip my_python_service/build/
 
       - name: Get TypeScript CI run ID
         id: typescript_run_id
         run: |
-          typescript_run_id=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/actions/workflows/typescript-ci.yml/runs | jq -r '.workflow_runs[] | select(.head_sha == "${{ github.event.workflow_run.head_sha }}") | .id')
-          echo "::set-output name=run_id::$typescript_run_id"
+          typescript_run_id=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/actions/workflows/typescript-ci.yml/runs?status=success | jq -r '.workflow_runs[0].id')
+          echo "run_id=$typescript_run_id" >> $GITHUB_OUTPUT
 
-      - name: Download TypeScript Lambda artifact
+      - name: Download all artifacts from TypeScript CI
         uses: actions/download-artifact@v3
         with:
-          name: typescript-lambda
-          path: my_ts_service/build
+          run_id: ${{ steps.typescript_run_id.outputs.run_id }}
+          path: typescript-artifacts
+
+      - name: List downloaded artifacts (TypeScript)
+        run: ls -R typescript-artifacts
+
+      - name: Download TypeScript Lambda artifact
+        run: |
+          cp typescript-artifacts/typescript-lambda/function.zip my_ts_service/build/
 
       - name: List files for debugging (Python)
         run: ls -R my_python_service/build
