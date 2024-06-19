@@ -24,8 +24,9 @@ jobs:
           pip install -r my_python_service/requirements.txt
 
       - name: Run tests
+        working-directory: my_python_service
         run: |
-          pytest my_python_service/tests
+          pytest
 
       - name: Create build directory
         run: mkdir -p my_python_service/build
