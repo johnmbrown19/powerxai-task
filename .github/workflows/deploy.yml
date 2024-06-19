@@ -15,55 +15,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download Run ID (Python)
-        uses: actions/download-artifact@v4
-        with:
-          name: python-run-id
-          path: python-run-id
-
-      - name: Read Run ID (Python)
-        id: python-run-id
-        run: echo "::set-output name=run_id::$(cat python-run-id/run_id.txt)"
-
-      - name: Download Python Lambda artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: python-lambda
-          path: my_python_service/src/function.zip
-          run-id: ${{ steps.python-run-id.outputs.run_id }}
-          repository: ${{ github.repository }}
-
-      - name: Download Run ID (TypeScript)
-        uses: actions/download-artifact@v4
-        with:
-          name: typescript-run-id
-          path: typescript-run-id
-
-      - name: Read Run ID (TypeScript)
-        id: typescript-run-id
-        run: echo "::set-output name=run_id::$(cat typescript-run-id/run_id.txt)"
-
-      - name: Download TypeScript Lambda artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: typescript-lambda
-          path: my_ts_service/dist/function.zip
-          run-id: ${{ steps.typescript-run-id.outputs.run_id }}
-          repository: ${{ github.repository }}
-
-      - name: Verify Python Lambda artifact
+      - name: List all available artifacts for debugging
         run: |
-          if [ ! -f my_python_service/src/function.zip ]; then
-            echo "Python Lambda artifact not found"
-            exit 1
-          fi
+          echo "Listing all artifacts in the repository"
+          gh api -X GET repos/${{ github.repository }}/actions/artifacts --paginate
 
-      - name: Verify TypeScript Lambda artifact
+      - name: Download Python Lambda artifact manually
         run: |
-          if [ ! -f my_ts_service/dist/function.zip ]; then
-            echo "TypeScript Lambda artifact not found"
-            exit 1
-          fi
+          curl -L -o python-lambda.zip https://github.com/johnmbrown19/powerxai-task/actions/runs/9572213893/artifacts/1614623106
+          unzip python-lambda.zip -d my_python_service/src
+
+      - name: Download TypeScript Lambda artifact manually
+        run: |
+          curl -L -o typescript-lambda.zip https://github.com/johnmbrown19/powerxai-task/actions/runs/9572213893/artifacts/1614623106
+          unzip typescript-lambda.zip -d my_ts_service/dist
 
       - name: List files for debugging (Python)
         run: ls -R my_python_service/src
