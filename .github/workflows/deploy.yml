@@ -15,27 +15,43 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: List all artifacts in the repository
-        run: gh api -X GET repos/${{ github.repository }}/actions/artifacts --paginate
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Set up Python and Node.js
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 
+      - name: List all artifacts in the repository
+        id: list-artifacts
+        run: |
+          gh api -X GET repos/${{ github.repository }}/actions/artifacts --paginate > artifacts.json
+          cat artifacts.json
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get Artifact URLs
+        id: get-artifact-urls
+        run: |
+          python <<EOF
+          import os
+          import json
+
+          with open('artifacts.json') as f:
+              artifacts = json.load(f)['artifacts']
+
+          for artifact in artifacts:
+              if artifact['name'] == 'python-lambda':
+                  print(f"::set-output name=python_url::{artifact['archive_download_url']}")
+              elif artifact['name'] == 'typescript-lambda':
+                  print(f"::set-output name=ts_url::{artifact['archive_download_url']}")
+          EOF
+
       - name: Download Python Lambda artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: python-lambda
-          path: my_python_service/build
+        run: |
+          curl -L -o my_python_service/build/function.zip ${{ steps.get-artifact-urls.outputs.python_url }}
 
       - name: Download TypeScript Lambda artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: typescript-lambda
-          path: my_ts_service/build
+        run: |
+          curl -L -o my_ts_service/build/function.zip ${{ steps.get-artifact-urls.outputs.ts_url }}
 
       - name: List files for debugging (Python)
         run: ls -R my_python_service/build
