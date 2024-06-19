@@ -20,20 +20,22 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           artifacts_url=${{ github.event.workflow_run.artifacts_url }}
-          gh api $artifacts_url > artifacts.json
+          curl -s -H "Authorization: Bearer $GH_TOKEN" $artifacts_url > artifacts.json
 
       - name: Extract Python Lambda artifact
         run: |
           artifact_download_url=$(jq -r '.artifacts[] | select(.name == "python-lambda") | .archive_download_url' artifacts.json)
-          wget -O python-lambda.zip $artifact_download_url
+          curl -s -L -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -o python-lambda.zip $artifact_download_url
           unzip python-lambda.zip -d my_python_service/build/
 
       - name: Extract TypeScript Lambda artifact
         run: |
           artifact_download_url=$(jq -r '.artifacts[] | select(.name == "typescript-lambda") | .archive_download_url' artifacts.json)
-          wget -O typescript-lambda.zip $artifact_download_url
+          curl -s -L -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -o typescript-lambda.zip $artifact_download_url
           unzip typescript-lambda.zip -d my_ts_service/build/
 
       - name: List files for debugging (Python)
