@@ -53,5 +53,14 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: python-lambda-${{ github.sha }}
+          name: python-lambda
           path: my_python_service/build/function.zip
+
+      - name: Output Run ID
+        run: echo ${{ github.run_id }} > run_id.txt
+
+      - name: Upload Run ID
+        uses: actions/upload-artifact@v3
+        with:
+          name: python-run-id
+          path: run_id.txt

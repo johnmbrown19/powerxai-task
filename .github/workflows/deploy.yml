@@ -19,17 +19,41 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Download Run ID (Python)
+        uses: actions/download-artifact@v3
+        with:
+          name: python-run-id
+          path: python-run-id
+
+      - name: Read Run ID (Python)
+        id: python-run-id
+        run: echo "::set-output name=run_id::$(cat python-run-id/run_id.txt)"
+
       - name: Download Python Lambda artifact
         uses: actions/download-artifact@v3
         with:
-          name: python-lambda-${{ github.sha }}
+          name: python-lambda
           path: my_python_service/build
+          run-id: ${{ steps.python-run-id.outputs.run_id }}
+          repository: ${{ github.repository }}
+
+      - name: Download Run ID (TypeScript)
+        uses: actions/download-artifact@v3
+        with:
+          name: typescript-run-id
+          path: typescript-run-id
+
+      - name: Read Run ID (TypeScript)
+        id: typescript-run-id
+        run: echo "::set-output name=run_id::$(cat typescript-run-id/run_id.txt)"
 
       - name: Download TypeScript Lambda artifact
         uses: actions/download-artifact@v3
         with:
-          name: typescript-lambda-${{ github.sha }}
+          name: typescript-lambda
           path: my_ts_service/build
+          run-id: ${{ steps.typescript-run-id.outputs.run_id }}
+          repository: ${{ github.repository }}
 
       - name: List files for debugging (Python)
         run: ls -R my_python_service/build
