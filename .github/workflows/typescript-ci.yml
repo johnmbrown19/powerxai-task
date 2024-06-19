@@ -22,15 +22,18 @@ jobs:
         node-version: 18
 
     - name: Install dependencies
+      working-directory: my_ts_service
       run: npm install
 
     - name: Run tests
+      working-directory: my_ts_service
       run: npm test
 
     - name: Build Lambda
+      working-directory: my_ts_service
       run: |
-        mkdir -p my_ts_service/dist
-        zip -r my_ts_service/dist/function.zip my_ts_service/dist
+        mkdir -p dist
+        zip -r dist/function.zip dist
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4

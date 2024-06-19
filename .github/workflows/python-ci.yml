@@ -22,17 +22,20 @@ jobs:
         python-version: 3.9
 
     - name: Install dependencies
+      working-directory: my_python_service
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
     - name: Run tests
+      working-directory: my_python_service
       run: pytest
 
     - name: Build Lambda
+      working-directory: my_python_service
       run: |
-        mkdir -p my_python_service/src
-        zip -r my_python_service/src/function.zip my_python_service/src
+        mkdir -p src
+        zip -r src/function.zip src
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
