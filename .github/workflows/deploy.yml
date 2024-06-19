@@ -11,6 +11,10 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      actions: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -21,19 +25,20 @@ jobs:
           node-version: '16'
 
       - name: List all artifacts
-        run: gh api -X GET repos/${{ github.repository }}/actions/artifacts --paginate --jq '.artifacts[] | "\(.id) \(.name)"'
         id: list-artifacts
+        run: gh api -X GET repos/${{ github.repository }}/actions/artifacts --paginate --jq '.artifacts[] | "\(.id) \(.name)"'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Delete all artifacts
+        if: always()
         run: |
           gh api -X GET repos/${{ github.repository }}/actions/artifacts --paginate --jq '.artifacts[].id' | while read -r artifact_id; do
             gh api -X DELETE repos/${{ github.repository }}/actions/artifacts/$artifact_id
           done
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # needs: list-artifacts
+        needs: list-artifacts
 
       - name: Download Python Lambda artifact
         uses: actions/download-artifact@v3
