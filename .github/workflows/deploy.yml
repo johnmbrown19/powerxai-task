@@ -29,6 +29,9 @@ jobs:
           artifacts_url=${{ github.event.workflow_run.artifacts_url }}
           curl -s -H "Authorization: Bearer $GH_TOKEN" $artifacts_url > artifacts.json
 
+      - name: Print artifacts data
+        run: cat artifacts.json
+
       - name: Extract Python Lambda artifact
         run: |
           artifact_download_url=$(jq -r '.artifacts[] | select(.name == "python-lambda") | .archive_download_url' artifacts.json)
