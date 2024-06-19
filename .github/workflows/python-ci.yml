@@ -34,11 +34,11 @@ jobs:
     - name: Build Lambda
       working-directory: my_python_service
       run: |
-        mkdir -p src
-        zip -r src/function.zip src
+        mkdir -p build
+        zip -r build/function.zip src
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: python-lambda
-        path: my_python_service/src/function.zip
+        path: my_python_service/build/function.zip

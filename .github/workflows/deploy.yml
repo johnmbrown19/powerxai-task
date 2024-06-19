@@ -19,19 +19,19 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: python-lambda
-          path: my_python_service/src
+          path: my_python_service/build
 
       - name: Download TypeScript Lambda artifact
         uses: actions/download-artifact@v4
         with:
           name: typescript-lambda
-          path: my_ts_service/dist
+          path: my_ts_service/build
 
       - name: List files for debugging (Python)
-        run: ls -R my_python_service/src
+        run: ls -R my_python_service/build
 
       - name: List files for debugging (TypeScript)
-        run: ls -R my_ts_service/dist
+        run: ls -R my_ts_service/build
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
