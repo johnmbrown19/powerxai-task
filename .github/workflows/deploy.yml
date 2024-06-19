@@ -15,56 +15,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up GitHub CLI
-        run: |
-          echo "Listing all artifacts in the repository"
-          gh api -X GET repos/${{ github.repository }}/actions/artifacts --paginate
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download Python Lambda artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: python-lambda
+          path: my_python_service/src
 
-      - name: Fetch artifact download URLs
-        id: artifact-urls
-        run: |
-          python <<EOF
-          import os
-          import requests
-          import json
-
-          repo = os.getenv('GITHUB_REPOSITORY')
-          token = os.getenv('GITHUB_TOKEN')
-          headers = {'Authorization': f'token {token}'}
-          url = f'https://api.github.com/repos/{repo}/actions/artifacts'
-          response = requests.get(url, headers=headers)
-          artifacts = response.json()['artifacts']
-
-          python_artifact = next((artifact for artifact in artifacts if artifact['name'] == 'python-lambda'), None)
-          ts_artifact = next((artifact for artifact in artifacts if artifact['name'] == 'typescript-lambda'), None)
-
-          if python_artifact:
-              with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
-                  env_file.write(f'PYTHON_ARTIFACT_ID={python_artifact["id"]}\n')
-          if ts_artifact:
-              with open(os.getenv('GITHUB_ENV'), 'a') as env_file:
-                  env_file.write(f'TS_ARTIFACT_ID={ts_artifact["id"]}\n')
-          EOF
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Download Python Lambda artifact using gh CLI
-        if: env.PYTHON_ARTIFACT_ID
-        run: |
-          gh run download ${{ github.run_id }} --name python-lambda --pattern "**/*.zip"
-          unzip -o -d my_python_service/src *.zip
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Download TypeScript Lambda artifact using gh CLI
-        if: env.TS_ARTIFACT_ID
-        run: |
-          gh run download ${{ github.run_id }} --name typescript-lambda --pattern "**/*.zip"
-          unzip -o -d my_ts_service/dist *.zip
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download TypeScript Lambda artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: typescript-lambda
+          path: my_ts_service/dist
 
       - name: List files for debugging (Python)
         run: ls -R my_python_service/src
@@ -73,14 +34,14 @@ jobs:
         run: ls -R my_ts_service/dist
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-central-1
 
       - name: Install Terraform
-        uses: hashicorp/setup-terraform@v1
+        uses: hashicorp/setup-terraform@v2
         with:
           terraform_wrapper: false
 
