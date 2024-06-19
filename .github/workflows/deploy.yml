@@ -22,6 +22,9 @@ jobs:
       - name: Print artifacts URL
         run: echo ${{ github.event.workflow_run.artifacts_url }}
 
+      - name: Print workflow run context
+        run: echo '${{ toJson(github.event.workflow_run) }}'
+
       - name: Download artifacts
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
