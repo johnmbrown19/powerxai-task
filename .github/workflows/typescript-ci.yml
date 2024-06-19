@@ -9,6 +9,10 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      actions: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -28,6 +32,19 @@ jobs:
           cd my_ts_service
           npm run build
 
+      - name: Set up GitHub CLI
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: List and delete all artifacts
+        run: |
+          gh api -X GET repos/${{ github.repository }}/actions/artifacts --paginate --jq '.artifacts[].id' | while read -r artifact_id; do
+            gh api -X DELETE repos/${{ github.repository }}/actions/artifacts/$artifact_id
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create build directory
         run: mkdir -p my_ts_service/build
 
@@ -37,5 +54,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: typescript-lambda
+          name: typescript-lambda-${{ github.sha }}
           path: my_ts_service/build/function.zip

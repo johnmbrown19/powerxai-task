@@ -9,6 +9,10 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      actions: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -25,8 +29,20 @@ jobs:
 
       - name: Run tests
         working-directory: my_python_service
+        run: pytest
+
+      - name: Set up GitHub CLI
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: List and delete all artifacts
         run: |
-          pytest
+          gh api -X GET repos/${{ github.repository }}/actions/artifacts --paginate --jq '.artifacts[].id' | while read -r artifact_id; do
+            gh api -X DELETE repos/${{ github.repository }}/actions/artifacts/$artifact_id
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create build directory
         run: mkdir -p my_python_service/build
@@ -37,5 +53,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: python-lambda
+          name: python-lambda-${{ github.sha }}
           path: my_python_service/build/function.zip
