@@ -22,14 +22,42 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Download Python Lambda artifact manually
+      - name: Fetch artifact download URLs
+        id: artifact-urls
         run: |
-          curl -L -o python-lambda.zip https://github.com/johnmbrown19/powerxai-task/actions/runs/9572213893/artifacts/1614623106
+          python <<EOF
+          import os
+          import requests
+          import json
+
+          repo = os.getenv('GITHUB_REPOSITORY')
+          token = os.getenv('GITHUB_TOKEN')
+          headers = {'Authorization': f'token {token}'}
+          url = f'https://api.github.com/repos/{repo}/actions/artifacts'
+          response = requests.get(url, headers=headers)
+          artifacts = response.json()['artifacts']
+
+          python_artifact = next((artifact for artifact in artifacts if artifact['name'] == 'python-lambda'), None)
+          ts_artifact = next((artifact for artifact in artifacts if artifact['name'] == 'typescript-lambda'), None)
+
+          if python_artifact:
+              print(f'::set-output name=python_url::{python_artifact["archive_download_url"]}')
+          if ts_artifact:
+              print(f'::set-output name=ts_url::{ts_artifact["archive_download_url"]}')
+          EOF
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download Python Lambda artifact manually
+        if: steps.artifact-urls.outputs.python_url
+        run: |
+          curl -L -o python-lambda.zip "${{ steps.artifact-urls.outputs.python_url }}"
           unzip python-lambda.zip -d my_python_service/src
 
       - name: Download TypeScript Lambda artifact manually
+        if: steps.artifact-urls.outputs.ts_url
         run: |
-          curl -L -o typescript-lambda.zip https://github.com/johnmbrown19/powerxai-task/actions/runs/9572213893/artifacts/1614623106
+          curl -L -o typescript-lambda.zip "${{ steps.artifact-urls.outputs.ts_url }}"
           unzip typescript-lambda.zip -d my_ts_service/dist
 
       - name: List files for debugging (Python)
