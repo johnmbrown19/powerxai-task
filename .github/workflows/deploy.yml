@@ -24,32 +24,24 @@ jobs:
         with:
           node-version: '16'
 
-      - name: List all artifacts
-        id: list-artifacts
-        run: gh api -X GET repos/${{ github.repository }}/actions/artifacts --paginate --jq '.artifacts[] | "\(.id) \(.name)"'
+      - name: List and delete all artifacts
+        run: |
+          gh api -X GET repos/${{ github.repository }}/actions/artifacts --paginate --jq '.artifacts[].id' | while read -r artifact_id; do
+            gh api -X DELETE repos/${{ github.repository }}/actions/artifacts/$artifact_id
+          done
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    #   - name: Delete all artifacts
-    #     if: always()
-    #     run: |
-    #       gh api -X GET repos/${{ github.repository }}/actions/artifacts --paginate --jq '.artifacts[].id' | while read -r artifact_id; do
-    #         gh api -X DELETE repos/${{ github.repository }}/actions/artifacts/$artifact_id
-    #       done
-    #     env:
-    #       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #     # needs: list-artifacts
-
       - name: Download Python Lambda artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
-          name: python-lambda-${{ github.sha }}
+          name: python-lambda
           path: my_python_service/build
 
       - name: Download TypeScript Lambda artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
-          name: typescript-lambda-${{ github.sha }}
+          name: typescript-lambda
           path: my_ts_service/build
 
       - name: List files for debugging (Python)

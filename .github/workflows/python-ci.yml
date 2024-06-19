@@ -25,7 +25,8 @@ jobs:
 
       - name: Run tests
         working-directory: my_python_service
-        run: pytest
+        run: |
+          pytest
 
       - name: Create build directory
         run: mkdir -p my_python_service/build
@@ -34,7 +35,7 @@ jobs:
         run: zip -r my_python_service/build/function.zip my_python_service/src
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
-          name: python-lambda-${{ github.sha }}
+          name: python-lambda
           path: my_python_service/build/function.zip

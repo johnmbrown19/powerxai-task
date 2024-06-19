@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,23 +19,23 @@ jobs:
           node-version: '16'
 
       - name: Install dependencies
-        run: npm install
-        working-directory: my_ts_service
+        run: |
+          cd my_ts_service
+          npm install
 
-      - name: Build the TypeScript service
-        run: npm run build
-        working-directory: my_ts_service
+      - name: Build project
+        run: |
+          cd my_ts_service
+          npm run build
 
       - name: Create build directory
         run: mkdir -p my_ts_service/build
-        working-directory: my_ts_service
 
-      - name: Zip the built files
-        run: zip -r my_ts_service/build/function.zip dist
-        working-directory: my_ts_service
+      - name: Zip function
+        run: zip -r my_ts_service/build/function.zip my_ts_service/dist
 
-      - name: Upload TypeScript Lambda artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: typescript-lambda-${{ github.sha }}
+          name: typescript-lambda
           path: my_ts_service/build/function.zip
