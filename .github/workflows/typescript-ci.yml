@@ -35,8 +35,7 @@ jobs:
         working-directory: my_ts_service
 
       - name: Upload TypeScript Lambda artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
-          name: typescript-lambda
+          name: typescript-lambda-${{ github.sha }}
           path: my_ts_service/build/function.zip
-          overwrite: true
