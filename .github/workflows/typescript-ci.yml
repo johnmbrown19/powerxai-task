@@ -27,6 +27,14 @@ jobs:
 
     - name: Build Lambda
       working-directory: my_ts_service
+      run: npm run build
+
+    - name: List files for debugging
+      working-directory: my_ts_service
+      run: ls -R dist
+
+    - name: Package Lambda
+      working-directory: my_ts_service
       run: |
         mkdir -p build
         zip -r build/function.zip dist
